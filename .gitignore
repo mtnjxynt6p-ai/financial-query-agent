@@ -50,3 +50,9 @@ htmlcov/
 
 # Jupyter
 .ipynb_checkpoints/
+# Interview guidance (kept private)
+INTERVIEW_*.md
+FAQ.md
+ARCHITECTURE.md
+START_HERE.md
+00_START_HERE.md
