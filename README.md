@@ -2,8 +2,6 @@
 
 A production-grade financial analysis agent demonstrating **agentic orchestration**, **tool composition**, and **LLM-as-judge validation** using LangGraph + LangChain + Claude.
 
-> **For interview prep**: See [INTERVIEW_NARRATIVE.md](INTERVIEW_NARRATIVE.md) for talking points, Q&A prep, and success criteria.
-
 ## Quick Demo (2-3 minutes)
 
 ```bash
@@ -38,16 +36,11 @@ User Query
 Response (recommendation + 0.0-1.0 guardrail score)
 ```
 
-See [ARCHITECTURE.md](ARCHITECTURE.md) for visual diagrams and scaling considerations.
-
 ## Project Structure
 
 ```
 financial_agent/
 ├── README.md                      # This file
-├── INTERVIEW_NARRATIVE.md         # Interview prep & talking points
-├── ARCHITECTURE.md                # Design patterns & diagrams
-├── FAQ.md                         # Q&A for common questions
 ├── requirements.txt               # Dependencies
 ├── .env.example                   # AWS Bedrock credentials template
 │
@@ -57,7 +50,7 @@ financial_agent/
 ├── prompts.py                     # System prompts & templates
 ├── guardrails.py                  # LLM-as-judge validation
 │
-├── demo.py                        # Clean 2-3 minute demo for interviews
+├── demo.py                        # Clean 2-3 minute demo
 ├── run_examples.py                # Run all 5 example queries
 ├── run_demo.py                    # Demo mode (no API keys needed)
 ├── test_agent.py                  # Unit tests
@@ -112,50 +105,7 @@ python3 run_demo.py
 ✓ Validation checks: 4/5 passed
 ```
 
-## Interview Talking Points
 
-### 1. Stateful Orchestration
-- **What:** LangGraph StateGraph maintains context across 5 nodes
-- **Why:** Each node can access/modify accumulated state (messages, tool_calls, indicators)
-- **Benefit:** Enables multi-turn conversations, audit trails, conditional logic
-
-### 2. Tool Composition
-- **What:** Three independent, typed tools (StockDataTool, IndicatorsTool, PortfolioTool)
-- **Why:** Each is testable, mockable, swappable
-- **Benefit:** Tools don't depend on LLM; LLM reasons over tool outputs
-
-### 3. LLM-as-Judge Validation
-- **What:** Second LLM validates first LLM's output
-- **Why:** Prevents hallucination, overconfidence, missing disclaimers
-- **Benefit:** Production-grade safety for financial recommendations
-
-### 4. Production Thinking
-- **Resilience:** Mock data fallback when yfinance is rate-limited
-- **Observability:** Every action logged + tool_calls audit trail
-- **Type safety:** Pydantic models catch errors at development time
-- **Caching:** 5-minute TTL reduces API calls
-
-## Why This Matters for Wells Fargo
-
-Financial AI needs to be:
-- **Explainable:** Why did you recommend X? (tool_calls log shows it)
-- **Safe:** Prevent overconfident or hallucinated advice (guardrails check)
-- **Auditable:** Compliance team can review every recommendation
-- **Reliable:** Work even when external APIs fail (mock fallback)
-
-This agent demonstrates all four.
-
-## Q&A Preparation
-
-**Common interview questions:**
-
-- **"Why StateGraph instead of simpler chains?"** → See FAQ.md
-- **"How would you scale to 1M queries/day?"** → Parallel tools, batch LLM API, caching
-- **"How do you prevent hallucination?"** → Grounding + guardrails + audit trail
-- **"What about costs?"** → ~$0.000045 per query, scales cost-effectively
-- **"How would you integrate with Wells Fargo systems?"** → REST API, embedded library, or batch processor
-
-See [FAQ.md](FAQ.md) for detailed answers.
 
 ## Technical Decisions
 
@@ -193,32 +143,4 @@ python3 run_examples.py
 4. **Backtesting**: Did this strategy have worked historically?
 5. **Compliance filters**: Reject recommendations violating investment policy
 
-## Files to Read for Interview
 
-1. **Start here:** [INTERVIEW_NARRATIVE.md](INTERVIEW_NARRATIVE.md) (30 min read)
-   - Executive summary, architecture overview, talking points, Q&A
-
-2. **Understand architecture:** [ARCHITECTURE.md](ARCHITECTURE.md) (15 min)
-   - Visual diagrams, state flow, tool ecosystem, scaling considerations
-
-3. **Prepare for questions:** [FAQ.md](FAQ.md) (20 min)
-   - Detailed answers to common interview questions
-
-4. **See the code:** [agent.py](agent.py) (start at `build_agent_graph()`)
-   - Core StateGraph implementation, 5 nodes, 150 lines
-
-## Success Criteria for Interview
-
-- ✅ Can explain the 5-node workflow in < 2 minutes
-- ✅ Understand why StateGraph + tool composition + guardrails
-- ✅ Can discuss scaling (parallel tools, batch API, caching)
-- ✅ Know the guardrail_score difference (0.8 = disclaimer regex issue, not a fundamental problem)
-- ✅ Can position as "agentic thinking" not "just a chatbot wrapper"
-
-## Key Stats
-
-- **Lines of code:** ~1,700 (8 modules)
-- **Demo runtime:** 2-3 minutes (full 5 nodes + validation)
-- **Cost per query:** ~$0.00005 (2 LLM calls + tools)
-- **Guardrail score:** 0.80/1.0 avg (4/5 checks passing)
-- **Uptime:** 99.9% (mock fallback when APIs fail)
