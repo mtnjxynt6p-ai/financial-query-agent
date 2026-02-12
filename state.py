@@ -101,6 +101,8 @@ class AgentState:
     
     def log_tool_call(self, tool_name: str, input_params: dict, output: Any) -> None:
         """Log a tool invocation."""
+        if self.tool_calls is None:
+            self.tool_calls = []
         self.tool_calls.append(
             ToolCall(
                 tool_name=tool_name,
