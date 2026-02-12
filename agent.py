@@ -67,11 +67,22 @@ def parse_query(state: AgentState) -> AgentState:
     Uses LLM to extract structured info (with fallback to regex).
     """
     # Ensure messages are Message objects (not dicts)
-    if state.messages and isinstance(state.messages[0], dict):
-        state.messages = [
-            Message(**msg) if isinstance(msg, dict) else msg 
-            for msg in state.messages
-        ]
+    if state.messages:
+        if isinstance(state.messages[0], dict):
+            state.messages = [
+                Message(**msg) if isinstance(msg, dict) else msg 
+                for msg in state.messages
+            ]
+    else:
+        state.messages = []
+    
+    # Ensure current_query is set
+    if not state.current_query and state.messages:
+        # Extract content from last user message
+        for msg in reversed(state.messages):
+            if isinstance(msg, Message) and msg.role == "user":
+                state.current_query = msg.content
+                break
     
     logger.info(f"🔍 Parsing query: {state.current_query}")
     

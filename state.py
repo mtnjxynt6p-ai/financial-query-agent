@@ -111,9 +111,11 @@ class AgentState:
     
     def get_conversation_history(self, limit: int = 10) -> str:
         """Get recent conversation as formatted string for LLM context."""
+        if not self.messages:
+            return ""
         recent = self.messages[-limit:]
         history = "\n".join(
             f"{msg.role.upper()}: {msg.content}" 
-            for msg in recent
+            for msg in recent if msg is not None
         )
         return history
