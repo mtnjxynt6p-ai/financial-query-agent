@@ -265,9 +265,10 @@ def validate(state: AgentState) -> AgentState:
     logger.info(f"✓ Validating response with guardrails...")
     
     # Prepare data context for hallucination check
+    tool_calls = state.tool_calls if state.tool_calls else []
     data_points = [
         f"{call.tool_name}: {json.dumps(call.output, default=str)}"
-        for call in state.tool_calls
+        for call in tool_calls
     ]
     
     validation_results = guardrail_validator.validate(state.final_response, data_context=data_points)
