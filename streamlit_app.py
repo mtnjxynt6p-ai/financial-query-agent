@@ -6,6 +6,7 @@ Run with: streamlit run streamlit_app.py
 import streamlit as st
 import logging
 from agent import build_agent_graph
+from state import Message
 from dotenv import load_dotenv
 
 # Load environment variables
@@ -127,8 +128,12 @@ if run_button and query:
             
             # Build and run agent
             agent = build_agent_graph()
+            
+            # Create proper Message object
+            user_message = Message(role="user", content=query)
+            
             result = agent.invoke({
-                "messages": [{"role": "user", "content": query}]
+                "messages": [user_message]
             })
             
             # Handle None result
