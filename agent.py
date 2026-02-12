@@ -66,6 +66,13 @@ def parse_query(state: AgentState) -> AgentState:
     
     Uses LLM to extract structured info (with fallback to regex).
     """
+    # Ensure messages are Message objects (not dicts)
+    if state.messages and isinstance(state.messages[0], dict):
+        state.messages = [
+            Message(**msg) if isinstance(msg, dict) else msg 
+            for msg in state.messages
+        ]
+    
     logger.info(f"🔍 Parsing query: {state.current_query}")
     
     parse_prompt = f"""Extract structured information from this financial query:
