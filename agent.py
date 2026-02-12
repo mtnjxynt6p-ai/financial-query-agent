@@ -199,9 +199,10 @@ def reason(state: AgentState) -> AgentState:
     logger.info(f"🧠 Reasoning over data...")
     
     # Prepare context from tool calls and data
+    tool_calls_list = state.tool_calls if state.tool_calls else []
     data_summary = "\n".join([
         f"Tool: {call.tool_name}, Output: {json.dumps(call.output, default=str)}"
-        for call in state.tool_calls[-5:]  # Last 5 calls
+        for call in tool_calls_list[-5:]  # Last 5 calls
     ])
     
     reasoning_context = f"""

@@ -131,11 +131,22 @@ if run_button and query:
                 "messages": [{"role": "user", "content": query}]
             })
             
-            # Extract results
-            symbols = result.get("symbols", [])
-            recommendation = result.get("recommendation", "No recommendation generated")
-            guardrail_score = result.get("guardrail_score", 0.0)
-            tool_calls = result.get("tool_calls", 0)
+            # Handle None result
+            if result is None:
+                st.error("❌ Agent returned no result. Check logs for details.")
+                logger.error("Agent.invoke() returned None")
+                st.stop()
+            
+            # Extract results with safe defaults
+            if isinstance(result, dict):
+                symbols = result.get("symbols", [])
+                recommendation = result.get("recommendation", "No recommendation generated")
+                guardrail_score = result.get("guardrail_score", 0.0)
+                tool_calls = result.get("tool_calls", 0)
+            else:
+                logger.error(f"Unexpected result type: {type(result)}, value: {result}")
+                st.error(f"❌ Unexpected result format. Got {type(result).__name__} instead of dict")
+                st.stop()
             
         st.success("✅ Analysis Complete!")
         
@@ -183,7 +194,14 @@ if run_button and query:
     except Exception as e:
         st.error(f"❌ Error running agent: {str(e)}")
         logger.error(f"Agent error: {e}", exc_info=True)
-        st.info("Make sure AWS Bedrock credentials are configured in `.env`")
+        st.info("""
+        **Troubleshooting:**
+        1. Make sure `.env` is configured with AWS credentials
+        2. Check that all dependencies are installed: `pip install -r requirements.txt`
+        3. Try running `python3 demo.py` to test the agent directly
+        4. Check the terminal logs above for detailed error messages
+        """)
+        st.stop()
 
 elif run_button:
     st.warning("⚠️ Please enter a question before clicking Analyze")
