@@ -147,7 +147,9 @@ if run_button and query:
                 symbols = result.get("symbols", [])
                 recommendation = result.get("recommendation", "No recommendation generated")
                 guardrail_score = result.get("guardrail_score", 0.0)
-                tool_calls = result.get("tool_calls", 0)
+                tool_calls_list = result.get("tool_calls", [])
+                # Count tool calls (could be list of objects or ints)
+                tool_calls_count = len(tool_calls_list) if isinstance(tool_calls_list, list) else 0
             else:
                 logger.error(f"Unexpected result type: {type(result)}, value: {result}")
                 st.error(f"❌ Unexpected result format. Got {type(result).__name__} instead of dict")
@@ -166,7 +168,7 @@ if run_button and query:
             st.metric("Symbols Analyzed", len(symbols), help=", ".join(symbols) if symbols else "None")
         
         with col3:
-            st.metric("Tool Calls", tool_calls, help="Number of tool invocations (data fetch, indicators, etc.)")
+            st.metric("Tool Calls", tool_calls_count, help="Number of tool invocations (data fetch, indicators, etc.)")
         
         st.divider()
         
