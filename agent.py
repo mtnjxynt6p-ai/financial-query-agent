@@ -139,6 +139,14 @@ def fetch_data(state: AgentState) -> AgentState:
     
     Logs tool calls for transparency.
     """
+    # Ensure state fields are initialized
+    if state.comparison_symbols is None:
+        state.comparison_symbols = []
+    if state.tool_calls is None:
+        state.tool_calls = []
+    if state.comparison_results is None:
+        state.comparison_results = []
+    
     logger.info(f"📊 Fetching data for: {state.comparison_symbols}")
     
     if not state.comparison_symbols:
@@ -176,6 +184,12 @@ def analyze(state: AgentState) -> AgentState:
     """
     Calculate technical indicators (RSI, volatility, momentum) for each stock.
     """
+    # Ensure state fields are initialized
+    if state.comparison_symbols is None:
+        state.comparison_symbols = []
+    if state.tool_calls is None:
+        state.tool_calls = []
+    
     logger.info(f"📈 Analyzing indicators...")
     
     for symbol in state.comparison_symbols[:5]:
