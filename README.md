@@ -50,7 +50,8 @@ financial_agent/
 ├── prompts.py                     # System prompts & templates
 ├── guardrails.py                  # LLM-as-judge validation
 │
-├── demo.py                        # Clean 2-3 minute demo
+├── streamlit_app.py               # Web UI for the agent (Streamlit)
+├── demo.py                        # Clean 2-3 minute CLI demo
 ├── run_examples.py                # Run all 5 example queries
 ├── run_demo.py                    # Demo mode (no API keys needed)
 ├── test_agent.py                  # Unit tests
@@ -73,7 +74,20 @@ cp .env.example .env
 # AWS_REGION=us-east-1
 ```
 
-### 3. Run the demo
+### 3. Run the agent
+
+**Option A: Web UI (Recommended)**
+```bash
+# Start Streamlit web interface
+streamlit run streamlit_app.py
+```
+Opens at `http://localhost:8501` with:
+- Interactive query input with example buttons
+- Real-time results with metrics (guardrail score, symbols, tool calls)
+- Expandable guardrail validation details
+- Full results JSON for transparency
+
+**Option B: Command-line demos**
 ```bash
 # Quick 2-3 min demo (2 queries)
 python3 demo.py
