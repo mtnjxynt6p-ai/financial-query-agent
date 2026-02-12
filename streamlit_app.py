@@ -144,12 +144,17 @@ if run_button and query:
             
             # Extract results with safe defaults
             if isinstance(result, dict):
-                symbols = result.get("symbols", [])
-                recommendation = result.get("recommendation", "No recommendation generated")
-                guardrail_score = result.get("guardrail_score", 0.0)
+                # Handle both dict and AgentState object
+                symbols = result.get("comparison_symbols", [])
+                recommendation = result.get("final_response", "") or result.get("recommendation", "")
+                guardrail_score = float(result.get("guardrail_checks", {}).get("score", 0.0)) if isinstance(result.get("guardrail_checks"), dict) else 0.0
                 tool_calls_list = result.get("tool_calls", [])
                 # Count tool calls (could be list of objects or ints)
                 tool_calls_count = len(tool_calls_list) if isinstance(tool_calls_list, list) else 0
+                
+                # Fallback if recommendation is still empty
+                if not recommendation:
+                    recommendation = "Agent completed but no specific recommendation was generated. Please try a more specific query."
             else:
                 logger.error(f"Unexpected result type: {type(result)}, value: {result}")
                 st.error(f"❌ Unexpected result format. Got {type(result).__name__} instead of dict")
@@ -179,12 +184,23 @@ if run_button and query:
         # Guardrail validation details
         with st.expander("🛡️ Guardrail Validation Details", expanded=guardrail_score < 1.0):
             st.write("**Validation Checks:**")
-            checks = result.get("validation_checks", {})
+            
+            # Try to get checks from guardrail_checks dict
+            guardrail_checks = result.get("guardrail_checks", {})
+            if isinstance(guardrail_checks, dict) and "checks" in guardrail_checks:
+                checks = guardrail_checks["checks"]
+            else:
+                checks = guardrail_checks
             
             if isinstance(checks, dict):
                 for check_name, check_result in checks.items():
-                    status = "✅" if check_result else "⚠️"
-                    st.write(f"{status} {check_name.replace('_', ' ').title()}: {'Pass' if check_result else 'Needs attention'}")
+                    # Handle both bool values and dict with 'passed' key
+                    if isinstance(check_result, dict):
+                        passed = check_result.get("passed", False)
+                    else:
+                        passed = bool(check_result)
+                    status = "✅" if passed else "⚠️"
+                    st.write(f"{status} {check_name.replace('_', ' ').title()}: {'Pass' if passed else 'Needs attention'}")
             else:
                 st.info("Validation details not available")
             
